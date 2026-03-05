@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio Editor | WeCanUseAI</title>
+  <meta name="description"
+    content="A professional browser-based audio editor. Record, trim, apply effects, and export audio — 100% private, runs entirely in your browser.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <h1><i class="fas fa-waveform-lines"></i> Audio Editor</h1>
+        <span class="badge">WeCanUseAI</span>
+      </div>
+      <div class="file-info" id="fileInfo">
+        <span id="fileName">No file loaded</span>
+        <span class="separator">|</span>
+        <span id="fileDuration">0:00</span>
+        <span class="separator">|</span>
+        <span id="fileSampleRate">—</span>
+      </div>
+    </header>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="toolbar-group">
+        <button id="btnImport" class="tool-btn" title="Import Audio (Ctrl+O)">
+          <i class="fas fa-folder-open"></i>
+          <span>Import</span>
+        </button>
+        <button id="btnRecord" class="tool-btn" title="Record from Mic (R)">
+          <i class="fas fa-microphone"></i>
+          <span>Record</span>
+        </button>
+        <input type="file" id="fileInput" accept="audio/*" hidden>
+      </div>
+
+      <div class="toolbar-divider"></div>
+
+      <div class="toolbar-group playback-controls">
+        <button id="btnPlay" class="tool-btn accent" title="Play/Pause (Space)" disabled>
+          <i class="fas fa-play"></i>
+        </button>
+        <button id="btnStop" class="tool-btn" title="Stop (Esc)" disabled>
+          <i class="fas fa-stop"></i>
+        </button>
+      </div>
+
+      <div class="toolbar-divider"></div>
+
+      <div class="toolbar-group">
+        <button id="btnUndo" class="tool-btn" title="Undo (Ctrl+Z)" disabled>
+          <i class="fas fa-undo"></i>
+        </button>
+        <button id="btnRedo" class="tool-btn" title="Redo (Ctrl+Y)" disabled>
+          <i class="fas fa-redo"></i>
+        </button>
+      </div>
+
+      <div class="toolbar-divider"></div>
+
+      <div class="toolbar-group">
+        <button id="btnZoomIn" class="tool-btn" title="Zoom In (+)" disabled>
+          <i class="fas fa-search-plus"></i>
+        </button>
+        <button id="btnZoomOut" class="tool-btn" title="Zoom Out (-)" disabled>
+          <i class="fas fa-search-minus"></i>
+        </button>
+        <button id="btnZoomFit" class="tool-btn" title="Fit to Window (0)" disabled>
+          <i class="fas fa-expand"></i>
+        </button>
+      </div>
+
+      <div class="toolbar-divider"></div>
+
+      <div class="toolbar-group">
+        <button id="btnSetStart" class="tool-btn marker-start" title="Set Start Marker (I)" disabled>
+          <i class="fas fa-arrow-right-to-bracket"></i>
+          <span>Set Start</span>
+        </button>
+        <button id="btnSetEnd" class="tool-btn marker-end" title="Set End Marker (O)" disabled>
+          <i class="fas fa-arrow-right-from-bracket"></i>
+          <span>Set End</span>
+        </button>
+        <button id="btnClearMarkers" class="tool-btn" title="Clear Markers (C)" disabled>
+          <i class="fas fa-xmark"></i>
+        </button>
+        <button id="btnSelectAll" class="tool-btn" title="Select All (Ctrl+A)" disabled>
+          <i class="fas fa-object-group"></i>
+          <span>Select All</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Waveform Area -->
+      <div class="waveform-panel">
+        <!-- Drop Zone Overlay -->
+        <div class="drop-zone" id="dropZone">
+          <div class="drop-zone-content">
+            <i class="fas fa-cloud-upload-alt fa-3x"></i>
+            <p>Drag & drop an audio file here</p>
+            <p class="hint">or <strong>click here</strong> / use <strong>Import</strong> / <strong>Record</strong></p>
+            <p class="formats">MP3, WAV, OGG, M4A, FLAC</p>
+          </div>
+        </div>
+
+        <!-- Time Ruler -->
+        <canvas id="timeRuler" class="time-ruler"></canvas>
+
+        <!-- Waveform Canvas -->
+        <div class="waveform-scroll" id="waveformScroll">
+          <canvas id="waveformCanvas"></canvas>
+        </div>
+
+        <!-- Selection Info / Precise Time Inputs -->
+        <div class="selection-info" id="selectionInfo">
+          <div class="time-input-group start-group">
+            <label class="marker-label start-label"><i class="fas fa-arrow-right-to-bracket"></i> Start</label>
+            <input type="number" id="preciseStart" class="time-input start-input" step="0.001" min="0" value="0"
+              title="Start time (seconds)">
+            <span class="unit">s</span>
+          </div>
+          <span class="arrow">→</span>
+          <div class="time-input-group end-group">
+            <label class="marker-label end-label"><i class="fas fa-arrow-right-from-bracket"></i> End</label>
+            <input type="number" id="preciseEnd" class="time-input end-input" step="0.001" min="0" value="0"
+              title="End time (seconds)">
+            <span class="unit">s</span>
+          </div>
+          <div class="time-input-group duration-group">
+            <label>Duration</label>
+            <span id="selectionDuration" class="selection-duration">0.000s</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Effects Panel -->
+      <div class="effects-panel">
+        <h3><i class="fas fa-sliders-h"></i> Effects & Editing</h3>
+
+        <div class="effects-grid">
+          <button id="btnTrim" class="effect-btn" title="Trim to Selection (T)" disabled>
+            <i class="fas fa-cut"></i>
+            <span>Trim</span>
+          </button>
+          <button id="btnDelete" class="effect-btn danger" title="Delete Selection (Del)" disabled>
+            <i class="fas fa-trash-alt"></i>
+            <span>Delete</span>
+          </button>
+          <button id="btnSilence" class="effect-btn" title="Silence Selection" disabled>
+            <i class="fas fa-volume-mute"></i>
+            <span>Silence</span>
+          </button>
+          <button id="btnFadeIn" class="effect-btn" title="Fade In" disabled>
+            <i class="fas fa-arrow-trend-up"></i>
+            <span>Fade In</span>
+          </button>
+          <button id="btnFadeOut" class="effect-btn" title="Fade Out" disabled>
+            <i class="fas fa-arrow-trend-down"></i>
+            <span>Fade Out</span>
+          </button>
+          <button id="btnReverse" class="effect-btn" title="Reverse" disabled>
+            <i class="fas fa-backward"></i>
+            <span>Reverse</span>
+          </button>
+          <button id="btnNormalize" class="effect-btn" title="Normalize Volume" disabled>
+            <i class="fas fa-chart-line"></i>
+            <span>Normalize</span>
+          </button>
+          <button id="btnSpeedUp" class="effect-btn" title="Speed Up (1.5x)" disabled>
+            <i class="fas fa-forward-fast"></i>
+            <span>Speed Up</span>
+          </button>
+          <button id="btnSlowDown" class="effect-btn" title="Slow Down (0.75x)" disabled>
+            <i class="fas fa-gauge-simple"></i>
+            <span>Slow Down</span>
+          </button>
+        </div>
+
+        <div class="volume-control">
+          <label><i class="fas fa-volume-high"></i> Volume</label>
+          <input type="range" id="volumeSlider" min="0" max="200" value="100" step="1">
+          <span id="volumeValue">100%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Export Bar -->
+    <div class="export-bar">
+      <div class="export-left">
+        <i class="fas fa-shield-alt text-success"></i>
+        <span>100% Private — No audio leaves your device</span>
+      </div>
+      <div class="export-right">
+        <button id="btnExport" class="export-btn" disabled>
+          <i class="fas fa-download"></i>
+          Download WAV
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
