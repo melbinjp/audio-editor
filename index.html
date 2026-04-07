@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Audio Editor | WeCanUseAI</title>
   <meta name="description"
-    content="A professional browser-based audio editor. Record, trim, apply effects, and export audio — 100% private, runs entirely in your browser.">
+    content="A professional browser-based audio editor. Record, trim, apply effects, and export audio â€” 100% private, runs entirely in your browser.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -27,7 +27,7 @@
         <span class="separator">|</span>
         <span id="fileDuration">0:00</span>
         <span class="separator">|</span>
-        <span id="fileSampleRate">—</span>
+        <span id="fileSampleRate">â€”</span>
       </div>
     </header>
 
@@ -132,7 +132,7 @@
               title="Start time (seconds)">
             <span class="unit">s</span>
           </div>
-          <span class="arrow">→</span>
+          <span class="arrow">â†’</span>
           <div class="time-input-group end-group">
             <label class="marker-label end-label"><i class="fas fa-arrow-right-from-bracket"></i> End</label>
             <input type="number" id="preciseEnd" class="time-input end-input" step="0.001" min="0" value="0"
@@ -201,7 +201,7 @@
     <div class="export-bar">
       <div class="export-left">
         <i class="fas fa-shield-alt text-success"></i>
-        <span>100% Private — No audio leaves your device</span>
+        <span>100% Private â€” No audio leaves your device</span>
       </div>
       <div class="export-right">
         <button id="btnExport" class="export-btn" disabled>
@@ -216,6 +216,18 @@
   <div id="toastContainer" class="toast-container"></div>
 
   <script src="app.js"></script>
+
+  <!-- Institutional Footer -->
+  <footer class="hub-footer">
+    <div class="footer-content">
+      <a href="https://wecanuseai.com" class="back-link">
+        <span class="icon">🏠</span> Back to WeCanUseAI.com
+      </a>
+      <div class="footer-info">
+        <span>Privacy-First</span> • <span>Zero-Friction</span> • <span>Jules Standard</span>
+      </div>
+    </div>
+  </footer>
 </body>
 
 </html>
