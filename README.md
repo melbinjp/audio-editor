@@ -1,6 +1,6 @@
 # 🎵 Audio Editor
 
-A professional browser-based audio editor built with vanilla JavaScript und the Web Audio API. Record, edit, and export audio — entirely client-side for maximum privacy.
+Client-side browser audio editor for recording, editing, and exporting audio with the Web Audio API.
 
 **Live Demo:** [audioeditor.wecanuseai.com](https://melbinjp.github.io/audio-editor/)
 
