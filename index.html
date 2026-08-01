@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Audio Editor | WeCanUseAI</title>
   <meta name="description"
-    content="A professional browser-based audio editor. Record, trim, apply effects, and export audio â€” 100% private, runs entirely in your browser.">
+    content="A professional browser-based audio editor. Record, trim, apply effects, and export audio — 100% private, runs entirely in your browser.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -27,7 +27,7 @@
         <span class="separator">|</span>
         <span id="fileDuration">0:00</span>
         <span class="separator">|</span>
-        <span id="fileSampleRate">â€”</span>
+        <span id="fileSampleRate">—</span>
       </div>
     </header>
 
@@ -201,7 +201,7 @@
     <div class="export-bar">
       <div class="export-left">
         <i class="fas fa-shield-alt text-success"></i>
-        <span>100% Private â€” No audio leaves your device</span>
+        <span>100% Private — No audio leaves your device</span>
       </div>
       <div class="export-right">
         <button id="btnExport" class="export-btn" disabled>
@@ -217,15 +217,15 @@
 
   <script src="app.js"></script>
 
-    <footer role="contentinfo" style="margin-top: 2rem; padding: 1.5rem; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); color: #888;">
-    <p>&copy; <span class="copyright-year"></span> WeCanUseAI. Empowering creativity with AI.</p>
-    <div style="margin-top: 0.5rem; display: flex; justify-content: center; gap: 1.5rem;">
-      <a href="https://wecanuseai.com/" style="color: inherit; text-decoration: none;">Home</a>
-      <a href="https://wecanuseai.com/privacy.html" style="color: inherit; text-decoration: none;">Privacy</a>
-      <a href="https://wecanuseai.com/terms.html" style="color: inherit; text-decoration: none;">Terms</a>
-      <a href="https://wecanuseai.com/contact.html" style="color: inherit; text-decoration: none;">Contact</a>
-    </div>
-  </footer>
+    <footer role="contentinfo" class="wcua-footer">
+      <p>&copy; <span class="copyright-year"></span> WeCanUseAI. Empowering creativity with AI.</p>
+      <nav class="wcua-footer-links" aria-label="Footer navigation">
+        <a href="https://wecanuseai.com/">Home</a>
+        <a href="https://wecanuseai.com/privacy.html">Privacy</a>
+        <a href="https://wecanuseai.com/terms.html">Terms</a>
+        <a href="https://wecanuseai.com/contact.html">Contact</a>
+      </nav>
+    </footer>
   <script>
     document.querySelectorAll('.copyright-year').forEach(el => {
       el.textContent = new Date().getFullYear();
