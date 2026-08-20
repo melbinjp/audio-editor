@@ -7,16 +7,16 @@ Client-side browser audio editor for recording, editing, and exporting audio wit
 ## ✨ Features
 
 ### Core
-- **Import Audio** — drag & drop or file picker (MP3, WAV, OGG, M4A, FLAC)
-- **Microphone Recording** — capture audio directly from your mic
-- **Interactive Waveform** — zoom, pan, and click-to-seek
-- **WAV Export** — download your edited audio
+- **Import Audio**: drag & drop or file picker (MP3, WAV, OGG, M4A, FLAC)
+- **Microphone Recording**: capture audio directly from your mic
+- **Interactive Waveform**: zoom, pan, and click-to-seek
+- **WAV Export**: download your edited audio
 
 ### Marker-Based Selection
-- **Set Start / End markers** — click to place draggable green (start) and orange (end) marker lines
-- **Drag to reposition** — grab marker handles to adjust precisely
-- **Time label pills** — each marker shows its exact time (ms precision) on the waveform
-- **Precise number inputs** — type exact start/end values in the bottom bar
+- **Set Start / End markers**: click to place draggable green (start) and orange (end) marker lines
+- **Drag to reposition**: grab marker handles to adjust precisely
+- **Time label pills**: each marker shows its exact time (ms precision) on the waveform
+- **Precise number inputs**: type exact start/end values in the bottom bar
 
 ### Editing & Effects
 - Trim to selection
@@ -55,13 +55,13 @@ Client-side browser audio editor for recording, editing, and exporting audio wit
 
 ## 🛠️ Tech Stack
 
-- **Web Audio API** — decoding, playback, effects
-- **Canvas API** — waveform & marker rendering
-- **MediaRecorder API** — mic recording
-- **Font Awesome 6** — icons
-- **Google Fonts (Inter)** — typography
+- **Web Audio API**: decoding, playback, effects
+- **Canvas API**: waveform & marker rendering
+- **MediaRecorder API**: mic recording
+- **Font Awesome 6**: icons
+- **Google Fonts (Inter)**: typography
 
-100% client-side — no server, no uploads, no tracking.
+100% client-side, no server, no uploads, no tracking.
 
 ## 📂 Project Structure
 
