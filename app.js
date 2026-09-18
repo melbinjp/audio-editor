@@ -17,6 +17,25 @@
         return `${m}:${s.toString().padStart(2, '0')}.${ms}`;
     }
 
+    const AUDIO_EXTS = new Set(['mp3', 'wav', 'ogg', 'm4a', 'flac', 'aac', 'opus', 'oga', 'weba', 'aiff', 'aif']);
+    const VIDEO_EXTS = new Set(['mp4', 'webm', 'mov', 'mkv', 'avi', '3gp', 'm4v', 'ogv', 'qt']);
+
+    function fileExt(file) {
+        const name = (file && file.name) || '';
+        const i = name.lastIndexOf('.');
+        return i >= 0 ? name.slice(i + 1).toLowerCase() : '';
+    }
+
+    function classifyMedia(file) {
+        const type = ((file && file.type) || '').toLowerCase();
+        if (type.startsWith('audio/')) return 'audio';
+        if (type.startsWith('video/')) return 'video';
+        const ext = fileExt(file);
+        if (AUDIO_EXTS.has(ext)) return 'audio';
+        if (VIDEO_EXTS.has(ext)) return 'video';
+        return 'unknown';
+    }
+
     function showToast(message, type = 'info') {
         const container = document.getElementById('toastContainer');
         const toast = document.createElement('div');
@@ -62,13 +81,91 @@
 
         async loadFile(file) {
             if (this.ctx.state === 'suspended') await this.ctx.resume();
+            const kind = classifyMedia(file);
             const arrayBuffer = await file.arrayBuffer();
-            this.buffer = await this.ctx.decodeAudioData(arrayBuffer);
+            let fromVideo = kind === 'video';
+            try {
+                this.buffer = await this.ctx.decodeAudioData(arrayBuffer.slice(0));
+            } catch (err) {
+                if (kind === 'audio') throw err;
+                // Video (or unknown): keep the audio track only. The picture is discarded.
+                this.buffer = await this._extractAudioFromVideo(file);
+                fromVideo = true;
+            }
+            if (!this.buffer || !this.buffer.length) {
+                throw new Error('This file has no audio');
+            }
             this.originalBuffer = this._cloneBuffer(this.buffer);
             this.currentSpeed = 1.0;
             this.pauseOffset = 0;
+            this.lastFromVideo = fromVideo;
             this.saveState();
             return this.buffer;
+        }
+
+        async _extractAudioFromVideo(file) {
+            const url = URL.createObjectURL(file);
+            const video = document.createElement('video');
+            video.preload = 'auto';
+            video.playsInline = true;
+            video.setAttribute('playsinline', '');
+            video.setAttribute('webkit-playsinline', '');
+            video.crossOrigin = 'anonymous';
+            video.muted = false;
+            video.volume = 0;
+            video.src = url;
+            video.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;left:-99px';
+            document.body.appendChild(video);
+
+            try {
+                await new Promise((resolve, reject) => {
+                    const timer = setTimeout(() => reject(new Error('Timed out reading this video')), 20000);
+                    video.onloadedmetadata = () => { clearTimeout(timer); resolve(); };
+                    video.onerror = () => { clearTimeout(timer); reject(new Error('Could not read this video')); };
+                });
+                if (!isFinite(video.duration) || video.duration <= 0) {
+                    throw new Error('This video has no playable duration');
+                }
+                if (this.ctx.state === 'suspended') await this.ctx.resume();
+
+                const source = this.ctx.createMediaElementSource(video);
+                const dest = this.ctx.createMediaStreamDestination();
+                source.connect(dest);
+                // Not connected to speakers: video frames and sound stay off-screen.
+
+                if (!dest.stream.getAudioTracks().length) {
+                    throw new Error('This video has no audio track');
+                }
+
+                const mimeCandidates = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'];
+                const mime = mimeCandidates.find((c) => window.MediaRecorder && MediaRecorder.isTypeSupported(c));
+                const recorder = mime
+                    ? new MediaRecorder(dest.stream, { mimeType: mime })
+                    : new MediaRecorder(dest.stream);
+                const chunks = [];
+                recorder.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+
+                await new Promise((resolve, reject) => {
+                    recorder.onerror = () => reject(new Error('Audio capture failed'));
+                    recorder.onstop = () => resolve();
+                    video.onended = () => { if (recorder.state === 'recording') recorder.stop(); };
+                    recorder.start(250);
+                    const play = video.play();
+                    if (play) play.catch(reject);
+                });
+
+                source.disconnect();
+                if (!chunks.length) throw new Error('This video has no audio track');
+                const blob = new Blob(chunks, { type: recorder.mimeType || 'audio/webm' });
+                const captured = await blob.arrayBuffer();
+                return await this.ctx.decodeAudioData(captured);
+            } finally {
+                video.pause();
+                video.removeAttribute('src');
+                video.load();
+                video.remove();
+                URL.revokeObjectURL(url);
+            }
         }
 
         async loadArrayBuffer(arrayBuffer) {
@@ -926,22 +1023,28 @@
         // ──── File Loading ────
         async _loadFile(file) {
             try {
-                if (!file.type.startsWith('audio/')) {
-                    showToast('Please select an audio file', 'error');
+                const kind = classifyMedia(file);
+                if (kind !== 'audio' && kind !== 'video' && kind !== 'unknown') {
+                    showToast('Please select an audio or video file', 'error');
                     return;
                 }
                 if (file.size > 200 * 1024 * 1024) {
                     showToast('File too large (max 200MB)', 'error');
                     return;
                 }
-                showToast('Loading audio...', 'info');
+                const looksLikeVideo = kind === 'video';
+                showToast(looksLikeVideo ? 'Extracting audio from video...' : 'Loading audio...', 'info');
                 await this.engine.loadFile(file);
                 this.renderer.setBuffer(this.engine.buffer);
-                this._onAudioLoaded(file.name);
-                showToast('Audio loaded successfully!', 'success');
+                const fromVideo = this.engine.lastFromVideo;
+                const displayName = fromVideo
+                    ? (file.name || 'Video').replace(/\.[^.]+$/, '') + ' (audio)'
+                    : (file.name || 'Audio');
+                this._onAudioLoaded(displayName);
+                showToast(fromVideo ? 'Video discarded. Audio is ready to edit.' : 'Audio loaded successfully!', 'success');
             } catch (err) {
                 console.error(err);
-                showToast('Failed to load audio file: ' + err.message, 'error');
+                showToast('Failed to load file: ' + err.message, 'error');
             }
         }
 
