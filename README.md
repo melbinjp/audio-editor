@@ -7,7 +7,7 @@ Client-side browser audio editor for recording, editing, and exporting audio wit
 ## ✨ Features
 
 ### Core
-- **Import Audio**: drag & drop or file picker (MP3, WAV, OGG, M4A, FLAC)
+- **Import Audio or Video**: drag & drop or file picker (MP3, WAV, OGG, M4A, FLAC, MP4, WEBM, MOV). Video picture is discarded; only the audio track is kept.
 - **Microphone Recording**: capture audio directly from your mic
 - **Interactive Waveform**: zoom, pan, and click-to-seek
 - **WAV Export**: download your edited audio
